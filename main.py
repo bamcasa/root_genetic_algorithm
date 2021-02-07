@@ -10,7 +10,7 @@ class ROOT:
     def __init__(self):
         self.FPS = 30
         self.screen = pygame.display.set_mode((780,780))
-        self.ROOT = [((50,150),(450,450)),((50,150),(300,450))]
+        self.ROOT = [((390,300),(390,450)),((350,150),(450,150))]
         self.WATER = []
         self.joined_WATER = []
         self.pos = 0
@@ -30,23 +30,27 @@ class ROOT:
         pass
     def get_point(self):
         for i in range(len(self.ROOT)):
-            #print(i)
-            if self.ROOT[i][0][0] == self.ROOT[i][1][0] or self.ROOT[i][0][1] == self.ROOT[i][1][1]:
+            if self.ROOT[i][0][0] == self.ROOT[i][1][0]: #y축과 평행한 직선
+                a = 1
+                b = 0
+                c = -1 * self.ROOT[i][0][0]
+            elif self.ROOT[i][0][1] == self.ROOT[i][1][1]: #x축과 평행한 직선
                 print("기울기 0")
+                a = 0
+                b = 1
+                c = -1 * self.ROOT[i][0][1]
             else:
                 slope = (self.ROOT[i][1][1] - self.ROOT[i][0][1]) / (self.ROOT[i][1][0] - self.ROOT[i][0][0])
                 #기울기 구하기 (y2-y1 / x2-x1)
-            a = slope
-            b = -1
-            c = -1 * slope * self.ROOT[i][0][0] + self.ROOT[i][0][1]
+                a = slope
+                b = -1
+                c = -1 * slope * self.ROOT[i][0][0] + self.ROOT[i][0][1]
 
             dump = set(self.joined_WATER)
             self.joined_WATER = list(dump) # 중복제거
 
             dump = set(self.WATER)
             self.WATER = list(dump)  # 중복제거
-
-            print(self.ROOT[i][0][1])
 
             for water in self.WATER:
                 if self.ROOT[i][0][0] >= self.ROOT[i][1][0]:
