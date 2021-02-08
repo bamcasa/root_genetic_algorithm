@@ -82,6 +82,8 @@ class ROOT:
             self.WATER.append((random.randint(0, 780), random.randint(0, 780)))
 
     def get_coord_ad(self,angle,distance):
+        #https://cafe.naver.com/mcbugi.cafe?iframe_url=/ArticleRead.nhn%3Farticleid=27916&social=1
+        #이분의 코드를 참고하여 만들었음
         point = [0,0]
         angle = math.pi * angle / 180; #라디안으로 변환
         point[0] = distance * math.cos(angle);
@@ -92,7 +94,7 @@ class ROOT:
         angle = 45
         distance = 100 * math.pow(2,1/2)
         point = self.get_coord_ad(angle,distance)
-        print(point)
+        #print(point)
         self.ROOT.append(((self.ROOT[0][1][0],self.ROOT[0][1][1]),(self.ROOT[0][0][0] + point[0],self.ROOT[0][0][1] + point[1])))
 
     def click_create_root(self, pos):
@@ -136,10 +138,11 @@ class ROOT:
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
                     self.set_water_position()
-                    self.create_new_root()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pos = pygame.mouse.get_pos()
                     self.click_create_root(pos)
+
+                    self.create_new_root()
 
             ROOT.show(self)
             pygame.display.flip()
