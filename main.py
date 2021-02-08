@@ -6,11 +6,12 @@ import math
 
 pygame.init()
 
+
 class ROOT:
     def __init__(self):
         self.FPS = 30
-        self.screen = pygame.display.set_mode((780,780))
-        self.ROOT = [((390,300),(390,450)),((350,150),(450,150))]
+        self.screen = pygame.display.set_mode((780, 780))
+        self.ROOT = [((390, 0), (390, 10))]
         self.WATER = []
         self.joined_WATER = []
         self.pos = 0
@@ -18,36 +19,37 @@ class ROOT:
 
         self.clicked = False
 
-        self.GRAY  = (180,180,180)
-        self.WHITE = (255,255,255)
-        self.BLUE  = (0, 0, 255)
-        self.RED   = (255,0,0)
-        self.GREEN = (0,255,0)
+        self.GRAY = (180, 180, 180)
+        self.WHITE = (255, 255, 255)
+        self.BLUE = (0, 0, 255)
+        self.RED = (255, 0, 0)
+        self.GREEN = (0, 255, 0)
 
         pygame.display.set_caption("ROOT_GENETIC_ALGORITHM")
-        #pygame.display.set_icon(self.icon)
+        # pygame.display.set_icon(self.icon)
+
     def restart(self):
         pass
+
     def get_point(self):
         for i in range(len(self.ROOT)):
-            if self.ROOT[i][0][0] == self.ROOT[i][1][0]: #y축과 평행한 직선
+            if self.ROOT[i][0][0] == self.ROOT[i][1][0]:  # y축과 평행한 직선
                 a = 1
                 b = 0
                 c = -1 * self.ROOT[i][0][0]
-            elif self.ROOT[i][0][1] == self.ROOT[i][1][1]: #x축과 평행한 직선
-                print("기울기 0")
+            elif self.ROOT[i][0][1] == self.ROOT[i][1][1]:  # x축과 평행한 직선
                 a = 0
                 b = 1
                 c = -1 * self.ROOT[i][0][1]
             else:
                 slope = (self.ROOT[i][1][1] - self.ROOT[i][0][1]) / (self.ROOT[i][1][0] - self.ROOT[i][0][0])
-                #기울기 구하기 (y2-y1 / x2-x1)
+                # 기울기 구하기 (y2-y1 / x2-x1)
                 a = slope
                 b = -1
                 c = -1 * slope * self.ROOT[i][0][0] + self.ROOT[i][0][1]
 
             dump = set(self.joined_WATER)
-            self.joined_WATER = list(dump) # 중복제거
+            self.joined_WATER = list(dump)  # 중복제거
 
             dump = set(self.WATER)
             self.WATER = list(dump)  # 중복제거
@@ -67,40 +69,51 @@ class ROOT:
                     min2 = self.ROOT[i][0][1]
                     max2 = self.ROOT[i][1][1]
 
-                if abs(a * water[0] + b * water[1] + c)/(math.sqrt(math.pow(a, 2) + math.pow(b, 2))) <= self.area and (
+                if abs(a * water[0] + b * water[1] + c) / (
+                math.sqrt(math.pow(a, 2) + math.pow(b, 2))) <= self.area and (
                         water[0] >= min1 - self.area and water[0] <= max1 + self.area and
                         water[1] >= min2 - self.area and water[1] <= max2 + self.area
                 ):
                     self.joined_WATER.append(water)
-        #print(len(self.joined_WATER), len(self.WATER))
+        # print(len(self.joined_WATER), len(self.WATER))
+
     def set_water_position(self):
         for i in range(500):
             self.WATER.append((random.randint(0, 780), random.randint(0, 780)))
-    def create_root(self,pos):
-        if self.clicked: #두번쨰 클릭 (clicked == TRUE)
-            print(self.pos,pos)
-            self.ROOT.append((self.pos,pos))
+
+    def create_new_root(self):
+        pass
+
+    def click_create_root(self, pos):
+        if self.clicked:  # 두번쨰 클릭 (clicked == TRUE)
+            print(self.pos, pos)
+            self.ROOT.append((self.pos, pos))
             self.clicked = False
             self.pos = 0
-        else: #첫번째 클릭 (clicked == FALSE)
+        else:  # 첫번째 클릭 (clicked == FALSE)
             self.clicked = True
             self.pos = pos
+
     def show_water(self):
         for water in self.WATER:
-            pygame.draw.circle(self.screen,self.BLUE,(water[0],water[1]),2)
+            pygame.draw.circle(self.screen, self.BLUE, (water[0], water[1]), 2)
         for water in self.joined_WATER:
             pygame.draw.circle(self.screen, self.RED, (water[0], water[1]), 2)
+
     def show_root(self):
         for i in range(len(self.ROOT)):
-            pygame.draw.line(self.screen, self.GREEN, self.ROOT[i][0],self.ROOT[i][1], 10)
+            pygame.draw.line(self.screen, self.GREEN, self.ROOT[i][0], self.ROOT[i][1], 10)
+
     def show_background(self):
         self.screen.fill(self.WHITE)
+
     def show(self):
         self.show_background()
-        #self.set_water_position()
+        # self.set_water_position()
         self.get_point()
         self.show_water()
         self.show_root()
+
     def main(self):
         clock = pygame.time.Clock()
         pygame.font.init()
@@ -114,10 +127,11 @@ class ROOT:
                     self.set_water_position()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pos = pygame.mouse.get_pos()
-                    self.create_root(pos)
+                    self.click_create_root(pos)
 
             ROOT.show(self)
             pygame.display.flip()
+
 
 if __name__ == "__main__":
     ROOT().main()
