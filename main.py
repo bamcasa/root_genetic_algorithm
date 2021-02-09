@@ -12,6 +12,7 @@ class ROOT:
         self.FPS = 30
         self.screen = pygame.display.set_mode((780, 780))
         self.ROOT = [((390, 0), (390, 20))]
+        self.ROOT_NUMBER = [0]
         self.WATER = []
         self.joined_WATER = []
         self.pos = 0
@@ -91,11 +92,14 @@ class ROOT:
         return point
 
     def create_new_root(self):
-        angle = 45
-        distance = 100 * math.pow(2,1/2)
+        angle = random.randint(50,125)  #45
+        distance = random.randint(80,120)  #100 * math.pow(2,1/2)
         point = self.get_coord_ad(angle,distance)
         #print(point)
-        self.ROOT.append(((self.ROOT[0][1][0],self.ROOT[0][1][1]),(self.ROOT[0][0][0] + point[0],self.ROOT[0][0][1] + point[1])))
+        number = self.ROOT_NUMBER[-1]
+        self.ROOT.append(((self.ROOT[number][1][0],self.ROOT[number][1][1]),(self.ROOT[number][0][0] + point[0],self.ROOT[number][0][1] + point[1])))
+        number+=1
+        self.ROOT_NUMBER.append(number)
 
     def click_create_root(self, pos):
         if self.clicked:  # 두번쨰 클릭 (clicked == TRUE)
@@ -114,6 +118,7 @@ class ROOT:
             pygame.draw.circle(self.screen, self.RED, (water[0], water[1]), 2)
 
     def show_root(self):
+        #print(self.ROOT_NUMBER)
         for i in range(len(self.ROOT)):
             pygame.draw.line(self.screen, self.GREEN, self.ROOT[i][0], self.ROOT[i][1], 10)
 
@@ -140,7 +145,7 @@ class ROOT:
                     self.set_water_position()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pos = pygame.mouse.get_pos()
-                    self.click_create_root(pos)
+                    #self.click_create_root(pos)
 
                     self.create_new_root()
 
