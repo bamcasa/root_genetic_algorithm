@@ -13,6 +13,7 @@ class ROOT:
         self.screen = pygame.display.set_mode((780, 780))
         self.ROOT = [((390, 0), (390, 20))]
         self.ROOT_NUMBER = [0]
+        self.ROOT_ANGLE = [0]
         self.WATER = []
         self.joined_WATER = []
         self.pos = 0
@@ -71,7 +72,7 @@ class ROOT:
                     max2 = self.ROOT[i][1][1]
 
                 if abs(a * water[0] + b * water[1] + c) / (
-                math.sqrt(math.pow(a, 2) + math.pow(b, 2))) <= self.area and (
+                        math.sqrt(math.pow(a, 2) + math.pow(b, 2))) <= self.area and (
                         water[0] >= min1 - self.area and water[0] <= max1 + self.area and
                         water[1] >= min2 - self.area and water[1] <= max2 + self.area
                 ):
@@ -82,23 +83,25 @@ class ROOT:
         for i in range(500):
             self.WATER.append((random.randint(0, 780), random.randint(0, 780)))
 
-    def get_coord_ad(self,angle,distance):
-        #https://cafe.naver.com/mcbugi.cafe?iframe_url=/ArticleRead.nhn%3Farticleid=27916&social=1
-        #이분의 코드를 참고하여 만들었음
-        point = [0,0]
-        angle = math.pi * angle / 180; #라디안으로 변환
+    def get_coord_ad(self, angle, distance):
+        # https://cafe.naver.com/mcbugi.cafe?iframe_url=/ArticleRead.nhn%3Farticleid=27916&social=1
+        # 이분의 코드를 참고하여 만들었음
+        point = [0, 0]
+        angle = math.pi * angle / 180  # 라디안으로 변환
         point[0] = distance * math.cos(angle);
         point[1] = distance * math.sin(angle);
         return point
 
     def create_new_root(self):
-        angle = random.randint(50,125)  #45
-        distance = random.randint(80,120)  #100 * math.pow(2,1/2)
-        point = self.get_coord_ad(angle,distance)
-        #print(point)
+        angle = random.randint(50, 125)  # 45
+        distance = random.randint(80, 120)  # 100 * math.pow(2,1/2)
+        point = self.get_coord_ad(angle, distance)
+        # print(point)
         number = self.ROOT_NUMBER[-1]
-        self.ROOT.append(((self.ROOT[number][1][0],self.ROOT[number][1][1]),(self.ROOT[number][0][0] + point[0],self.ROOT[number][0][1] + point[1])))
-        number+=1
+        self.ROOT.append(((self.ROOT[number][1][0], self.ROOT[number][1][1]),
+                          (self.ROOT[number][0][0] + point[0], self.ROOT[number][0][1] + point[1])))
+        number += 1
+        self.ROOT_ANGLE.append(angle)
         self.ROOT_NUMBER.append(number)
 
     def click_create_root(self, pos):
@@ -118,7 +121,8 @@ class ROOT:
             pygame.draw.circle(self.screen, self.RED, (water[0], water[1]), 2)
 
     def show_root(self):
-        #print(self.ROOT_NUMBER)
+        print("NUMBER", self.ROOT_NUMBER, len(self.ROOT_NUMBER))
+        print("ANGLE", self.ROOT_ANGLE, len(self.ROOT_ANGLE))
         for i in range(len(self.ROOT)):
             pygame.draw.line(self.screen, self.GREEN, self.ROOT[i][0], self.ROOT[i][1], 10)
 
@@ -145,7 +149,7 @@ class ROOT:
                     self.set_water_position()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pos = pygame.mouse.get_pos()
-                    #self.click_create_root(pos)
+                    # self.click_create_root(pos)
 
                     self.create_new_root()
 
