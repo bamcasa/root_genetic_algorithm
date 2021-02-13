@@ -3,12 +3,21 @@ import pygame
 import sys
 import random
 import math
+import copy
+
 
 pygame.init()
 
 
 class ROOT:
     def __init__(self):
+        self.chromos = np.zeros((10, 10, 2))
+        self.new_chromos = copy.deepcopy(self.chromos)
+        self.mutation = 0.01  # 돌연변이 생성률
+        self.parent_cromo_index = [[0, 0],
+                                   [0, 0]]
+        self.generation = 0
+
         self.FPS = 30
         self.screen = pygame.display.set_mode((780, 780))
         self.ROOT = [((390, 0), (390, 20))]
@@ -30,8 +39,72 @@ class ROOT:
         pygame.display.set_caption("ROOT_GENETIC_ALGORITHM")
         # pygame.display.set_icon(self.icon)
 
+        self.create_1_generation()
+
     def restart(self):
         pass
+
+    def create_1_generation(self):
+        for i in range(len(self.chromos)):
+            for j in range(len(self.chromos[0])):
+                for __ in range(len(self.chromos[0][0])):
+                    self.chromos[i][j][0] = random.randint(50, 125)  # angle 값
+                    self.chromos[i][j][1] = random.randint(80, 120)  # distance 값
+        # pprint.pprint(chromos)
+        self.generation += 1
+
+    def evalution(self, chromos):
+        evalution_value = np.zeros((len(chromos), len(chromos[0])))
+        print(chromos[1][1])
+        for i in range(len(evalution_value)):
+            for j in range(len(evalution_value[0])):
+                m_sum = 0
+                m_sum += self.get_point2(chromos[i][j])
+                evalution_value[i][j] = m_sum
+
+        return evalution_value
+
+    def chromos_crossover(self, chromos):
+        for i in range(len(chromos)):
+            for j in range(len(chromos[0])):
+                for k in range(len(chromos[0][0])):
+                    if random.random() < self.mutation:
+                        self.new_chromos[i][j][0] = random.randint(50, 125)
+                        self.new_chromos[i][j][1] = random.randint(80, 120)
+                        #돌연변이 생성
+                    else:
+                        random1 = random.randint(0, 1)
+                        self.new_chromos[i][j][k] = chromos[self.parent_cromo_index[random1][0]][self.parent_cromo_index[random1][1]][k]
+
+        self.chromos = copy.deepcopy(self.new_chromos)
+
+    def genetic_algorithm(self):
+        evalution_value = self.evalution(self.chromos)
+        reshaped = evalution_value.reshape(len(evalution_value) * len (evalution_value[0]))
+        argsorted_reshaped = np.argsort(reshaped)
+        max_point = argsorted_reshaped[::-1][0]
+
+        y = max_point//len(evalution_value)
+        x = max_point%len(evalution_value)
+
+        for i in range(2):
+            self.parent_cromo_index[i][0] = y
+            self.parent_cromo_index[i][1] = x
+
+        self.chromos_crossover(self.chromos)
+
+
+        print("=============================")
+        print(self.generation, "Gen :", self.chromos)
+        print('evalution value :', evalution_value)
+        print('selected parent :', self.parent_cromo_index)
+        self.generation += 1
+
+    def get_point2(self,chromo):
+        angle = chromo[0]
+        distance = chromo[1]
+
+        return angle + distance
 
     def get_point(self):
         for i in range(len(self.ROOT)):
@@ -88,8 +161,8 @@ class ROOT:
         # 이분의 코드를 참고하여 만들었음
         point = [0, 0]
         angle = math.pi * angle / 180  # 라디안으로 변환
-        point[0] = distance * math.cos(angle);
-        point[1] = distance * math.sin(angle);
+        point[0] = distance * math.cos(angle)
+        point[1] = distance * math.sin(angle)
         return point
 
     def create_new_root(self):
@@ -121,8 +194,8 @@ class ROOT:
             pygame.draw.circle(self.screen, self.RED, (water[0], water[1]), 2)
 
     def show_root(self):
-        print("NUMBER", self.ROOT_NUMBER, len(self.ROOT_NUMBER))
-        print("ANGLE", self.ROOT_ANGLE, len(self.ROOT_ANGLE))
+        #print("NUMBER", self.ROOT_NUMBER, len(self.ROOT_NUMBER))
+        #print("ANGLE", self.ROOT_ANGLE, len(self.ROOT_ANGLE))
         for i in range(len(self.ROOT)):
             pygame.draw.line(self.screen, self.GREEN, self.ROOT[i][0], self.ROOT[i][1], 10)
 
@@ -150,6 +223,7 @@ class ROOT:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pos = pygame.mouse.get_pos()
                     # self.click_create_root(pos)
+                    self.genetic_algorithm()
 
                     self.create_new_root()
 
