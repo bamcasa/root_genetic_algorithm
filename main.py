@@ -12,6 +12,7 @@ pygame.init()
 class ROOT:
     def __init__(self):
         self.tm = time.localtime(time.time())
+        self.number = 0
 
         self.chromos = np.zeros((10, 10, 2))
         self.new_chromos = copy.deepcopy(self.chromos)
@@ -37,20 +38,36 @@ class ROOT:
         self.BLUE = (0, 0, 255)
         self.RED = (255, 0, 0)
         self.GREEN = (0, 255, 0)
+        self.BLACK = (0, 0, 0)
+
+        self.font = pygame.font.SysFont("arial", 20, True, False)
 
         pygame.display.set_caption("ROOT_GENETIC_ALGORITHM")
         # pygame.display.set_icon(self.icon)
 
         self.create_1_generation()
 
-    def restart(self):
-        pass
+    def reset(self):
+        self.ROOT = [((390, 0), (390, 20))]
+        self.ROOT_NUMBER = [0]
+        self.ROOT_ANGLE = [0]
+        self.joined_WATER = []
 
     def write_log(self, text):
-        with open(f"LOG/{self.tm.tm_mon}월 {self.tm.tm_mday}일 {self.tm.tm_hour}시 {self.tm.tm_min}분 {self.tm.tm_sec}초.txt", "a") as f:
+        with open(
+                f"LOG/{self.tm.tm_mon}월 {self.tm.tm_mday}일 {self.tm.tm_hour}시 {self.tm.tm_min}분 {self.tm.tm_sec}초.txt",
+                "a") as f:
             f.write(f"GENE : {self.generation}")
             f.write(str(text))
             f.write("\n")
+
+    def chromos_to_root(self):
+        self.reset()
+        print(self.number)
+        for j in range(10):
+            self.create_new_root2(self.chromos[self.number][j][0], self.chromos[self.number][j][1])
+        #self.chromos[i][j][0]  # angle
+        #self.chromos[i][j][1]  # distance
 
     def create_1_generation(self):
         for i in range(len(self.chromos)):
@@ -60,6 +77,7 @@ class ROOT:
                     self.chromos[i][j][1] = random.randint(80, 120)  # distance 값
         # pprint.pprint(chromos)
         self.generation += 1
+        self.write_log(self.chromos)
 
     def evalution(self, chromos):
         evalution_value = np.zeros((len(chromos), len(chromos[0])))
@@ -79,28 +97,28 @@ class ROOT:
                     if random.random() < self.mutation:
                         self.new_chromos[i][j][0] = random.randint(50, 125)
                         self.new_chromos[i][j][1] = random.randint(80, 120)
-                        #돌연변이 생성
+                        # 돌연변이 생성
                     else:
                         random1 = random.randint(0, 1)
-                        self.new_chromos[i][j][k] = chromos[self.parent_cromo_index[random1][0]][self.parent_cromo_index[random1][1]][k]
+                        self.new_chromos[i][j][k] = \
+                        chromos[self.parent_cromo_index[random1][0]][self.parent_cromo_index[random1][1]][k]
 
         self.chromos = copy.deepcopy(self.new_chromos)
 
     def genetic_algorithm(self):
         evalution_value = self.evalution(self.chromos)
-        reshaped = evalution_value.reshape(len(evalution_value) * len (evalution_value[0]))
+        reshaped = evalution_value.reshape(len(evalution_value) * len(evalution_value[0]))
         argsorted_reshaped = np.argsort(reshaped)
         max_point = argsorted_reshaped[::-1][0]
 
-        y = max_point//len(evalution_value)
-        x = max_point%len(evalution_value)
+        y = max_point // len(evalution_value)
+        x = max_point % len(evalution_value)
 
         for i in range(2):
             self.parent_cromo_index[i][0] = y
             self.parent_cromo_index[i][1] = x
 
         self.chromos_crossover(self.chromos)
-
 
         print("=============================")
         print(self.generation, "Gen :", self.chromos)
@@ -109,7 +127,7 @@ class ROOT:
         self.write_log(self.chromos)
         self.generation += 1
 
-    def get_point2(self,chromo):
+    def get_point2(self, chromo):
         angle = chromo[0]
         distance = chromo[1]
 
@@ -186,6 +204,16 @@ class ROOT:
         self.ROOT_ANGLE.append(angle)
         self.ROOT_NUMBER.append(number)
 
+    def create_new_root2(self, angle, distance):
+        point = self.get_coord_ad(angle, distance)
+        # print(point)
+        number = self.ROOT_NUMBER[-1]
+        self.ROOT.append(((self.ROOT[number][1][0], self.ROOT[number][1][1]),
+                          (self.ROOT[number][0][0] + point[0], self.ROOT[number][0][1] + point[1])))
+        number += 1
+        self.ROOT_ANGLE.append(angle)
+        self.ROOT_NUMBER.append(number)
+
     def click_create_root(self, pos):
         if self.clicked:  # 두번쨰 클릭 (clicked == TRUE)
             print(self.pos, pos)
@@ -196,6 +224,11 @@ class ROOT:
             self.clicked = True
             self.pos = pos
 
+    def show_gene(self):
+        pygame.draw.rect(self.screen, self.WHITE, [0, 0, 170, 50]) #텍스트뒤에 하얀색 배경 표시
+        self.screen.blit(self.font.render(f"GENE : {self.generation}  number : {self.number}", True, self.BLACK), (0, 0)) #세대와 number 출력
+        self.screen.blit(self.font.render(f"POINT : {len(self.joined_WATER)}", True, self.BLACK), (0, 20))
+
     def show_water(self):
         for water in self.WATER:
             pygame.draw.circle(self.screen, self.BLUE, (water[0], water[1]), 2)
@@ -203,8 +236,8 @@ class ROOT:
             pygame.draw.circle(self.screen, self.RED, (water[0], water[1]), 2)
 
     def show_root(self):
-        #print("NUMBER", self.ROOT_NUMBER, len(self.ROOT_NUMBER))
-        #print("ANGLE", self.ROOT_ANGLE, len(self.ROOT_ANGLE))
+        # print("NUMBER", self.ROOT_NUMBER, len(self.ROOT_NUMBER))
+        # print("ANGLE", self.ROOT_ANGLE, len(self.ROOT_ANGLE))
         for i in range(len(self.ROOT)):
             pygame.draw.line(self.screen, self.GREEN, self.ROOT[i][0], self.ROOT[i][1], 10)
 
@@ -217,6 +250,7 @@ class ROOT:
         self.get_point()
         self.show_water()
         self.show_root()
+        self.show_gene()
 
     def main(self):
         clock = pygame.time.Clock()
@@ -232,9 +266,11 @@ class ROOT:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pos = pygame.mouse.get_pos()
                     # self.click_create_root(pos)
-                    self.genetic_algorithm()
-
-                    self.create_new_root()
+                    # self.genetic_algorithm()
+                    self.chromos_to_root()
+                    self.number += 1
+                    if self.number == 10:
+                        self.number = 0
 
             ROOT.show(self)
             pygame.display.flip()
