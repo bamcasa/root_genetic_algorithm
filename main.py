@@ -4,13 +4,15 @@ import sys
 import random
 import math
 import copy
-
+ㅈimport time
 
 pygame.init()
 
 
 class ROOT:
     def __init__(self):
+        self.tm = time.localtime(time.time())
+
         self.chromos = np.zeros((10, 10, 2))
         self.new_chromos = copy.deepcopy(self.chromos)
         self.mutation = 0.01  # 돌연변이 생성률
@@ -43,6 +45,12 @@ class ROOT:
 
     def restart(self):
         pass
+
+    def write_log(self, text):
+        with open(f"LOG/{self.tm.tm_mon}월 {self.tm.tm_mday}일 {self.tm.tm_hour}시 {self.tm.tm_min}분 {self.tm.tm_sec}초.txt", "a") as f:
+            f.write(f"GENE : {self.generation}")
+            f.write(str(text))
+            f.write("\n")
 
     def create_1_generation(self):
         for i in range(len(self.chromos)):
@@ -98,6 +106,7 @@ class ROOT:
         print(self.generation, "Gen :", self.chromos)
         print('evalution value :', evalution_value)
         print('selected parent :', self.parent_cromo_index)
+        self.write_log(self.chromos)
         self.generation += 1
 
     def get_point2(self,chromo):
