@@ -4,7 +4,7 @@ import sys
 import random
 import math
 import copy
-ㅈimport time
+import time
 
 pygame.init()
 
