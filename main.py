@@ -17,8 +17,7 @@ class ROOT:
         self.chromos = np.zeros((10, 10, 2))
         self.new_chromos = copy.deepcopy(self.chromos)
         self.mutation = 0.01  # 돌연변이 생성률
-        self.parent_cromo_index = [[0, 0],
-                                   [0, 0]]
+        self.parent_cromo_index = [0, 0]
         self.generation = 0
 
         self.FPS = 30
@@ -47,6 +46,9 @@ class ROOT:
 
         self.create_1_generation()
 
+        for __ in range(5):
+            self.set_water_position()
+
     def reset(self):
         self.ROOT = [((390, 0), (390, 20))]
         self.ROOT_NUMBER = [0]
@@ -73,50 +75,42 @@ class ROOT:
         for i in range(len(self.chromos)):
             for j in range(len(self.chromos[0])):
                 for __ in range(len(self.chromos[0][0])):
-                    self.chromos[i][j][0] = random.randint(50, 125)  # angle 값
-                    self.chromos[i][j][1] = random.randint(80, 120)  # distance 값
+                    self.chromos[i][j][0] = random.randint(20, 155)  # angle 값
+                    self.chromos[i][j][1] = random.randint(100, 150)  # distance 값
         # pprint.pprint(chromos)
         self.generation += 1
         self.write_log(self.chromos)
 
     def evalution(self, chromos):
-        evalution_value = np.zeros((len(chromos), len(chromos[0])))
-        print(chromos[1][1])
+        evalution_value = np.zeros((len(chromos)))
+        #print(chromos[1][1])
         for i in range(len(evalution_value)):
-            for j in range(len(evalution_value[0])):
-                m_sum = 0
-                m_sum += self.get_point2(chromos[i][j])
-                evalution_value[i][j] = m_sum
+            m_sum = self.get_point2(i)
+            print(m_sum)
+            evalution_value[i] = m_sum
 
         return evalution_value
 
     def chromos_crossover(self, chromos):
         for i in range(len(chromos)):
             for j in range(len(chromos[0])):
+                random1 = random.randint(0, 1)
                 for k in range(len(chromos[0][0])):
                     if random.random() < self.mutation:
                         self.new_chromos[i][j][0] = random.randint(50, 125)
                         self.new_chromos[i][j][1] = random.randint(80, 120)
                         # 돌연변이 생성
                     else:
-                        random1 = random.randint(0, 1)
-                        self.new_chromos[i][j][k] = \
-                        chromos[self.parent_cromo_index[random1][0]][self.parent_cromo_index[random1][1]][k]
+                        self.new_chromos[i][j][k] = chromos[self.parent_cromo_index[random1]][j][k]
 
         self.chromos = copy.deepcopy(self.new_chromos)
 
     def genetic_algorithm(self):
         evalution_value = self.evalution(self.chromos)
-        reshaped = evalution_value.reshape(len(evalution_value) * len(evalution_value[0]))
-        argsorted_reshaped = np.argsort(reshaped)
-        max_point = argsorted_reshaped[::-1][0]
-
-        y = max_point // len(evalution_value)
-        x = max_point % len(evalution_value)
-
+        argsorted_value = np.argsort(evalution_value)[::-1]
+        print("argsort : ",argsorted_value)
         for i in range(2):
-            self.parent_cromo_index[i][0] = y
-            self.parent_cromo_index[i][1] = x
+            self.parent_cromo_index[i] = argsorted_value[i]
 
         self.chromos_crossover(self.chromos)
 
@@ -127,11 +121,12 @@ class ROOT:
         self.write_log(self.chromos)
         self.generation += 1
 
-    def get_point2(self, chromo):
-        angle = chromo[0]
-        distance = chromo[1]
+    def get_point2(self, i):
+        self.reset()
+        for j in range(10):
+            self.create_new_root2(self.chromos[i][j][0], self.chromos[i][j][1])
 
-        return angle + distance
+        return self.get_point()
 
     def get_point(self):
         for i in range(len(self.ROOT)):
@@ -177,6 +172,7 @@ class ROOT:
                         water[1] >= min2 - self.area and water[1] <= max2 + self.area
                 ):
                     self.joined_WATER.append(water)
+        return len(self.joined_WATER)
         # print(len(self.joined_WATER), len(self.WATER))
 
     def set_water_position(self):
@@ -262,7 +258,9 @@ class ROOT:
                     pygame.quit()
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
-                    self.set_water_position()
+                    for i in range(1):
+                        self.genetic_algorithm()
+                    #self.set_water_position()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     pos = pygame.mouse.get_pos()
                     # self.click_create_root(pos)
