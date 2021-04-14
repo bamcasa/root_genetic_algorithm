@@ -5,12 +5,17 @@ import random
 import math
 import copy
 import time
+import os
 
 pygame.init()
 
 
 class ROOT:
     def __init__(self):
+        if not os.path.exists("LOG"): #LOG 폴더 생성
+            print("LOG 폴더 생성")
+            os.makedirs("LOG")
+
         self.tm = time.localtime(time.time()) #LOG작성을 위한 현재 시간을 얻어냄
         self.number = 0 #유전자의 번호값
 
@@ -30,6 +35,7 @@ class ROOT:
 
         self.pos = 0 #마우스의 좌표
         self.area = 50 #뿌리의 범위
+        self.minus_ratio = 0.05
 
         self.clicked = False
 
@@ -160,8 +166,13 @@ class ROOT:
         self.reset()
         for j in range(10):
             self.create_new_root(self.chromos[i][j][0], self.chromos[i][j][1])
+        minus_point = 0
+        for j in range(10):
+            minus_point += self.chromos[i][j][1]
+        #print("minus_point : ",minus_point)
 
-        return self.get_point()
+
+        return self.get_point() - minus_point * self.minus_ratio
 
     def get_point(self):
         """
@@ -223,7 +234,7 @@ class ROOT:
     def set_water_position(self):
         #랜덤값 좌표에 물을 놓음
         for i in range(500):
-            self.WATER.append((random.randint(0, 780), random.randint(0, 780)))
+            self.WATER.append((random.randint(0, 780), random.randint(600, 780)))
 
     def get_coord_ad(self, angle, distance):
         # https://cafe.naver.com/mcbugi.cafe?iframe_url=/ArticleRead.nhn%3Farticleid=27916&social=1
