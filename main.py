@@ -16,10 +16,11 @@ class ROOT:
             print("LOG 폴더 생성")
             os.makedirs("LOG")
 
+
         self.tm = time.localtime(time.time()) #LOG작성을 위한 현재 시간을 얻어냄
         self.number = 0 #유전자의 번호값
 
-        self.chromos = np.zeros((10, 10, 2)) #z10 y10 x2 사이즈의 3차원 배열
+        self.chromos = np.zeros((10, 20, 2)) #z10 y20 x2 사이즈의 3차원 배열
         self.new_chromos = copy.deepcopy(self.chromos)
         self.mutation = 0.01  # 돌연변이 생성률
         self.parent_cromo_index = [0, 0] #부모가 되는 유전자의 수(우수한 유전자)
@@ -54,6 +55,9 @@ class ROOT:
         pygame.display.set_caption("ROOT_GENETIC_ALGORITHM")
         # pygame.display.set_icon(self.icon)
 
+        #뿌리의 색깔
+        self.root_color = self.GREEN
+
         self.create_1_generation()
 
         for __ in range(5):
@@ -81,13 +85,25 @@ class ROOT:
     def chromos_to_root(self):
         """
         유전자를 뿌리로 만듦
-        유전자에 적힌 angle값과 distance값을 create_new_root2함수에 넣어
+        유전자에 적힌 angle값과 distance값을 create_new_root함수에 넣어
         뿌리를 생성함
         """
         self.reset()
-        print(self.number)
-        for j in range(10):
-            self.create_new_root(self.chromos[self.number][j][0], self.chromos[self.number][j][1])
+        #print(self.number)
+        for i in range(int(len(self.chromos[0])/10)):
+            self.aaa = i
+            for j in range(10):
+                print(j + i * 10)
+                self.create_new_root(self.chromos[self.number][j + i * 10][0], self.chromos[self.number][j + i * 10][1])
+            print(self.ROOT_NUMBER)
+            print(self.ROOT_ANGLE)
+            self.ROOT_NUMBER = [0]
+            self.ROOT_ANGLE = [0]
+
+        print(f"{self.number} : {self.ROOT}")
+ #       print(self.ROOT_NUMBER)
+#        print(self.ROOT_ANGLE)
+
         #self.chromos[i][j][0]  # angle
         #self.chromos[i][j][1]  # distance
 
@@ -117,7 +133,7 @@ class ROOT:
         #print(chromos[1][1])
         for i in range(len(evalution_value)):
             m_sum = self.get_point2(i)
-            print(m_sum)
+            #print(m_sum)
             evalution_value[i] = m_sum
 
         return evalution_value
@@ -145,16 +161,16 @@ class ROOT:
     def genetic_algorithm(self):
         evalution_value = self.evalution(self.chromos)
         argsorted_value = np.argsort(evalution_value)[::-1]
-        print("argsort : ",argsorted_value)
+        #print("argsort : ",argsorted_value)
         for i in range(2):
             self.parent_cromo_index[i] = argsorted_value[i]
 
         self.chromos_crossover(self.chromos)
 
-        print("=============================")
-        print(self.generation, "Gen :", self.chromos)
-        print('evalution value :', evalution_value)
-        print('selected parent :', self.parent_cromo_index)
+        #print("=============================")
+        #print(self.generation, "Gen :", self.chromos)
+        #print('evalution value :', evalution_value)
+        #print('selected parent :', self.parent_cromo_index)
         self.write_log(self.chromos)
         self.generation += 1
 
@@ -164,10 +180,14 @@ class ROOT:
         get_point함수로 뿌리로 인해 얻은 점수의 값을 반환한다.
         """
         self.reset()
-        for j in range(10):
-            self.create_new_root(self.chromos[i][j][0], self.chromos[i][j][1])
+        for i in range(int(len(self.chromos[0]) / 10)):
+            self.aaa = i
+            for j in range(10):
+                self.create_new_root(self.chromos[self.number][j + i * 10][0], self.chromos[self.number][j + i * 10][1])
+            self.ROOT_NUMBER = [0]
+            self.ROOT_ANGLE = [0]
         minus_point = 0
-        for j in range(10):
+        for j in range(len(self.chromos[0])):
             minus_point += self.chromos[i][j][1]
         #print("minus_point : ",minus_point)
 
@@ -175,9 +195,6 @@ class ROOT:
         return self.get_point() - minus_point * self.minus_ratio
 
     def get_point(self):
-        """
-
-        """
         for i in range(len(self.ROOT)):
             if self.ROOT[i][0][0] == self.ROOT[i][1][0]:  # y축과 평행한 직선
                 a = 1
@@ -241,11 +258,11 @@ class ROOT:
         # 이분의 코드를 참고하여 만들었음
         point = [0, 0]
         angle = math.pi * angle / 180  # 라디안으로 변환
-        point[0] = distance * math.cos(angle)
-        point[1] = distance * math.sin(angle)
+        point[0] = int(distance * math.cos(angle))
+        point[1] = int(distance * math.sin(angle))
         return point
 
-    def create_random_root(self):
+    """def create_random_root(self):
         #랜덤한 각도와 거리로 새로운 ROOT좌표를 얻음
         angle = random.randint(50, 125)
         distance = random.randint(80, 120)
@@ -256,23 +273,22 @@ class ROOT:
         number += 1
         self.ROOT_ANGLE.append(angle)
         self.ROOT_NUMBER.append(number)
-
+"""
     def create_new_root(self, angle, distance):
         #각도와 거리로 새로운 ROOT좌표를 얻음
         point = self.get_coord_ad(angle, distance) #새로운 ROOT좌표를 얻음
-        # print(point)
         number = self.ROOT_NUMBER[-1]
-        self.ROOT.append(((self.ROOT[number][1][0], self.ROOT[number][1][1]),
+        self.ROOT.append(((self.ROOT[number][1][0]           , self.ROOT[number][1][1]),
                           (self.ROOT[number][0][0] + point[0], self.ROOT[number][0][1] + point[1])))
         number += 1
         self.ROOT_ANGLE.append(angle)
         self.ROOT_NUMBER.append(number)
 
-    def click_create_root(self, pos):
-        """
+    """def click_create_root(self, pos):
+        
         첫번째 클릭한 점과 두번째 클릭한 점을
         각각 ROOT좌표로 정한다.
-        """
+        
         if self.clicked:  # 두번쨰 클릭 (clicked == TRUE)
             print(self.pos, pos)
             self.ROOT.append((self.pos, pos))
@@ -281,7 +297,7 @@ class ROOT:
         else:  # 첫번째 클릭 (clicked == FALSE)
             self.clicked = True
             self.pos = pos
-
+    """
     def show_gene(self):
         pygame.draw.rect(self.screen, self.WHITE, [0, 0, 170, 50]) #텍스트뒤에 하얀색 배경 표시
         self.screen.blit(self.font.render(f"GENE : {self.generation}  number : {self.number}", True, self.BLACK), (0, 0)) #세대와 number 출력
@@ -294,10 +310,13 @@ class ROOT:
             pygame.draw.circle(self.screen, self.RED, (water[0], water[1]), 2) #뿌리와 인접한 물은 빨간색으로 표시
 
     def show_root(self):
+        self.root_color = self.GREEN
         # print("NUMBER", self.ROOT_NUMBER, len(self.ROOT_NUMBER))
         # print("ANGLE", self.ROOT_ANGLE, len(self.ROOT_ANGLE))
         for i in range(len(self.ROOT)):
-            pygame.draw.line(self.screen, self.GREEN, self.ROOT[i][0], self.ROOT[i][1], 10) #ROOT의 두 좌표를 잇는 직선을 생성
+            if i >= 10:
+                self.root_color = self.BLUE
+            pygame.draw.line(self.screen, self.root_color, self.ROOT[i][0], self.ROOT[i][1], 10) #ROOT의 두 좌표를 잇는 직선을 생성
 
     def show_background(self):
         self.screen.fill(self.WHITE)
