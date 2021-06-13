@@ -20,9 +20,9 @@ class ROOT:
         self.tm = time.localtime(time.time()) #LOG작성을 위한 현재 시간을 얻어냄
         self.number = 0 #유전자의 번호값
 
-        self.chromos = np.zeros((10, 20, 2)) #z10 y20 x2 사이즈의 3차원 배열
+        self.chromos = np.zeros((10, 50, 2)) #z50 y20 x2 사이즈의 3차원 배열
         self.new_chromos = copy.deepcopy(self.chromos)
-        self.mutation = 0.01  # 돌연변이 생성률
+        self.mutation = 0.05  # 돌연변이 생성률
         self.parent_cromo_index = [0, 0] #부모가 되는 유전자의 수(우수한 유전자)
         self.generation = 0 #세대
 
@@ -93,7 +93,7 @@ class ROOT:
         for i in range(int(len(self.chromos[0])/10)):
             self.aaa = i
             for j in range(10):
-                print(j + i * 10)
+                #print(j + i * 10)
                 self.create_new_root(self.chromos[self.number][j + i * 10][0], self.chromos[self.number][j + i * 10][1])
             print(self.ROOT_NUMBER)
             print(self.ROOT_ANGLE)
@@ -116,8 +116,8 @@ class ROOT:
         for i in range(len(self.chromos)):
             for j in range(len(self.chromos[0])):
                 for __ in range(len(self.chromos[0][0])):
-                    self.chromos[i][j][0] = random.randint(50, 150)  # angle 값
-                    self.chromos[i][j][1] = random.randint(80, 150)  # distance 값
+                    self.chromos[i][j][0] = random.randint(70, 130)  # angle 값
+                    self.chromos[i][j][1] = random.randint(100, 150)  # distance 값
         # pprint.pprint(chromos)
         self.generation += 1
         self.write_log(self.chromos)
@@ -164,6 +164,8 @@ class ROOT:
         #print("argsort : ",argsorted_value)
         for i in range(2):
             self.parent_cromo_index[i] = argsorted_value[i]
+        print(self.parent_cromo_index)
+        self.number = self.parent_cromo_index[0]
 
         self.chromos_crossover(self.chromos)
 
@@ -174,7 +176,7 @@ class ROOT:
         self.write_log(self.chromos)
         self.generation += 1
 
-    def get_point2(self, i):
+    def get_point2(self, k):
         """
         입력받은 유전자의 값으로 뿌리를 생성한 후
         get_point함수로 뿌리로 인해 얻은 점수의 값을 반환한다.
@@ -183,15 +185,16 @@ class ROOT:
         for i in range(int(len(self.chromos[0]) / 10)):
             self.aaa = i
             for j in range(10):
-                self.create_new_root(self.chromos[self.number][j + i * 10][0], self.chromos[self.number][j + i * 10][1])
+                self.create_new_root(self.chromos[k][j + i * 10][0], self.chromos[k][j + i * 10][1])
             self.ROOT_NUMBER = [0]
             self.ROOT_ANGLE = [0]
+
         minus_point = 0
         for j in range(len(self.chromos[0])):
             minus_point += self.chromos[i][j][1]
         #print("minus_point : ",minus_point)
 
-
+        #print(self.get_point() - minus_point * self.minus_ratio)
         return self.get_point() - minus_point * self.minus_ratio
 
     def get_point(self):
@@ -251,7 +254,7 @@ class ROOT:
     def set_water_position(self):
         #랜덤값 좌표에 물을 놓음
         for i in range(500):
-            self.WATER.append((random.randint(0, 780), random.randint(600, 780)))
+            self.WATER.append((random.randint(0, 780), random.randint(100, 780)))
 
     def get_coord_ad(self, angle, distance):
         # https://cafe.naver.com/mcbugi.cafe?iframe_url=/ArticleRead.nhn%3Farticleid=27916&social=1
@@ -278,6 +281,9 @@ class ROOT:
         #각도와 거리로 새로운 ROOT좌표를 얻음
         point = self.get_coord_ad(angle, distance) #새로운 ROOT좌표를 얻음
         number = self.ROOT_NUMBER[-1]
+        if self.aaa >= 1 and number == 1:
+            number += 10 * self.aaa
+        #print(f"num : {number}, aaa : {self.aaa}")
         self.ROOT.append(((self.ROOT[number][1][0]           , self.ROOT[number][1][1]),
                           (self.ROOT[number][0][0] + point[0], self.ROOT[number][0][1] + point[1])))
         number += 1
@@ -314,8 +320,8 @@ class ROOT:
         # print("NUMBER", self.ROOT_NUMBER, len(self.ROOT_NUMBER))
         # print("ANGLE", self.ROOT_ANGLE, len(self.ROOT_ANGLE))
         for i in range(len(self.ROOT)):
-            if i >= 10:
-                self.root_color = self.BLUE
+            #if i >= 10:
+            #    self.root_color = self.BLUE
             pygame.draw.line(self.screen, self.root_color, self.ROOT[i][0], self.ROOT[i][1], 10) #ROOT의 두 좌표를 잇는 직선을 생성
 
     def show_background(self):
@@ -335,6 +341,7 @@ class ROOT:
         pygame.font.init()
         while True:
             clock.tick(self.FPS)
+            self.genetic_algorithm()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: #나가기
                     pygame.quit()
