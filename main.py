@@ -191,7 +191,7 @@ class ROOT:
 
         minus_point = 0
         for j in range(len(self.chromos[0])):
-            minus_point += self.chromos[i][j][1]
+            minus_point += self.chromos[k][j][1]
         #print("minus_point : ",minus_point)
 
         #print(self.get_point() - minus_point * self.minus_ratio)
