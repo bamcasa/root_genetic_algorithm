@@ -36,7 +36,7 @@ class ROOT:
 
         self.pos = 0 #마우스의 좌표
         self.area = 50 #뿌리의 범위
-        self.minus_ratio = 0.05
+        self.minus_ratio = 0.1
 
         self.clicked = False
 
@@ -116,7 +116,7 @@ class ROOT:
         for i in range(len(self.chromos)):
             for j in range(len(self.chromos[0])):
                 for __ in range(len(self.chromos[0][0])):
-                    self.chromos[i][j][0] = random.randint(70, 130)  # angle 값
+                    self.chromos[i][j][0] = random.randint(70, 110)  # angle 값
                     self.chromos[i][j][1] = random.randint(100, 150)  # distance 값
         # pprint.pprint(chromos)
         self.generation += 1
@@ -150,8 +150,8 @@ class ROOT:
                 random1 = random.randint(0, 1)
                 for k in range(len(chromos[0][0])):
                     if random.random() < self.mutation:
-                        self.new_chromos[i][j][0] = random.randint(50, 125)
-                        self.new_chromos[i][j][1] = random.randint(80, 120)
+                        self.new_chromos[i][j][0] = random.randint(70, 110) #angle값
+                        self.new_chromos[i][j][1] = random.randint(80, 120) #distance
                         # 돌연변이 생성
                     else:
                         self.new_chromos[i][j][k] = chromos[self.parent_cromo_index[random1]][j][k]
