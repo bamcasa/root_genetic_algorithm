@@ -4,6 +4,16 @@ import random
 import numpy as np
 import copy
 import pprint
+import time
+
+tm = time.localtime(time.time())
+
+def write_log(text,gen):
+
+    with open(f"LOG/{tm.tm_mon}M {tm.tm_mday}D {tm.tm_hour}hour {tm.tm_min}min {tm.tm_sec}sec.txt", "a") as f:
+        f.write(f"GENE : {gen}")
+        f.write(str(text))
+        f.write("\n")
 
 def get_point(chromo):
     angle = chromo[0]
@@ -41,6 +51,7 @@ if __name__ == '__main__':
                 chromos[i][j][1] = random.randint(80, 120) #distance 값
     #pprint.pprint(chromos)
     generation += 1
+    write_log(chromos,generation)
 
     while True:
         if generation > 1000:
@@ -93,6 +104,7 @@ if __name__ == '__main__':
                         new_chromos[i][j][k] = chromos[parent_cromo_index[random1][0]][parent_cromo_index[random1][1]][k]
 
         chromos = copy.deepcopy(new_chromos)
+        write_log(chromos,generation)
 
         print("=============================")
         print(generation, "Gen :", chromos)
