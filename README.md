@@ -1,9 +1,9 @@
 # 연초고 재학중
 거제시 연초고등학교에 현재 재학중이다.
 
-#작동 예시
+# 작동 예시
 
-#실행 방법
+# 실행 방법
 ![Alt text](https://raw.githubusercontent.com/bamcasa/root_genetic_algorithm/main/Image/start_1.png)  
 CODE 버튼을 클릭한다.  
 ![Alt text](https://raw.githubusercontent.com/bamcasa/root_genetic_algorithm/main/Image/start_2.png)  
