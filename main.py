@@ -20,7 +20,7 @@ class ROOT:
         self.tm = time.localtime(time.time()) #LOG작성을 위한 현재 시간을 얻어냄
         self.number = 0 #유전자의 번호값
 
-        self.chromos = np.zeros((10, 50, 2)) #z50 y20 x2 사이즈의 3차원 배열
+        self.chromos = np.zeros((10, 60, 2)) #z50 y20 x2 사이즈의 3차원 배열
         self.new_chromos = copy.deepcopy(self.chromos)
         self.mutation = 0.05  # 돌연변이 생성률
         self.parent_cromo_index = [0, 0] #부모가 되는 유전자의 수(우수한 유전자)
@@ -36,7 +36,9 @@ class ROOT:
 
         self.pos = 0 #마우스의 좌표
         self.area = 50 #뿌리의 범위
-        self.minus_ratio = 0.1
+        self.minus_ratio = 0.05 #감점 포인트 비율
+        self.angle_range = 60
+        self.distance_range = 30
 
         self.clicked = False
 
@@ -57,6 +59,7 @@ class ROOT:
 
         #뿌리의 색깔
         self.root_color = self.GREEN
+
 
         self.create_1_generation()
 
@@ -116,8 +119,8 @@ class ROOT:
         for i in range(len(self.chromos)):
             for j in range(len(self.chromos[0])):
                 for __ in range(len(self.chromos[0][0])):
-                    self.chromos[i][j][0] = random.randint(70, 110)  # angle 값
-                    self.chromos[i][j][1] = random.randint(100, 150)  # distance 값
+                    self.chromos[i][j][0] = random.randint(90 - self.angle_range, 90 + self.angle_range)  # angle 값
+                    self.chromos[i][j][1] = random.randint(75 - self.distance_range, 75 + self.distance_range)  # distance 값
         # pprint.pprint(chromos)
         self.generation += 1
         self.write_log(self.chromos)
@@ -150,8 +153,8 @@ class ROOT:
                 random1 = random.randint(0, 1)
                 for k in range(len(chromos[0][0])):
                     if random.random() < self.mutation:
-                        self.new_chromos[i][j][0] = random.randint(70, 110) #angle값
-                        self.new_chromos[i][j][1] = random.randint(80, 120) #distance
+                        random.randint(90 - self.angle_range, 90 + self.angle_range)  # angle 값
+                        self.chromos[i][j][1] = random.randint(75 - self.distance_range, 75 + self.distance_range)  # distance 값
                         # 돌연변이 생성
                     else:
                         self.new_chromos[i][j][k] = chromos[self.parent_cromo_index[random1]][j][k]
@@ -186,6 +189,7 @@ class ROOT:
             self.aaa = i
             for j in range(10):
                 self.create_new_root(self.chromos[k][j + i * 10][0], self.chromos[k][j + i * 10][1])
+            #print(self.ROOT_ANGLE)
             self.ROOT_NUMBER = [0]
             self.ROOT_ANGLE = [0]
 
@@ -193,7 +197,6 @@ class ROOT:
         for j in range(len(self.chromos[0])):
             minus_point += self.chromos[k][j][1]
         #print("minus_point : ",minus_point)
-
         #print(self.get_point() - minus_point * self.minus_ratio)
         return self.get_point() - minus_point * self.minus_ratio
 
@@ -253,8 +256,14 @@ class ROOT:
 
     def set_water_position(self):
         #랜덤값 좌표에 물을 놓음
-        for i in range(500):
-            self.WATER.append((random.randint(0, 780), random.randint(100, 780)))
+        for i in range(200):
+            self.WATER.append((random.randint(0, 780), random.randint(50, 780)))
+        for i in range(100):
+                self.WATER.append((random.randint(0, 780), random.randint(50, 300)))
+        for i in range(300):
+            self.WATER.append((random.randint(0, 780), random.randint(50, 600)))
+        for i in range(200):
+            self.WATER.append((random.randint(0, 780), random.randint(100, 700)))
 
     def get_coord_ad(self, angle, distance):
         # https://cafe.naver.com/mcbugi.cafe?iframe_url=/ArticleRead.nhn%3Farticleid=27916&social=1
@@ -263,6 +272,7 @@ class ROOT:
         angle = math.pi * angle / 180  # 라디안으로 변환
         point[0] = int(distance * math.cos(angle))
         point[1] = int(distance * math.sin(angle))
+        #print(point)
         return point
 
     """def create_random_root(self):
@@ -285,7 +295,7 @@ class ROOT:
             number += 10 * self.aaa
         #print(f"num : {number}, aaa : {self.aaa}")
         self.ROOT.append(((self.ROOT[number][1][0]           , self.ROOT[number][1][1]),
-                          (self.ROOT[number][0][0] + point[0], self.ROOT[number][0][1] + point[1])))
+                          (self.ROOT[number][1][0] + point[0], self.ROOT[number][1][1] + point[1])))
         number += 1
         self.ROOT_ANGLE.append(angle)
         self.ROOT_NUMBER.append(number)
