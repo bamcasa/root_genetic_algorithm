@@ -1,5 +1,8 @@
-# 연초고 재학중
-거제시 연초고등학교에 현재 재학중이다.
+# root_genetic_algorithm
+- 뿌리의 형태를 설명하기 위해 유전 알고리즘을 이용해 시뮬레이션을 돌린 것이다.
+- 유전 알고리즘을 통해 뿌리의 형태를 최적화를 시키는데 최적화를 다 시킨후의 뿌리의 형태가 현실의 뿌리 형태와 같음을 설명한다.
+- 그로인해 현실의 뿌리가 왜 이런식인지 설명할 수 있게 된다.
+
 
 # 작동 예시
 ![Alt text](https://raw.githubusercontent.com/bamcasa/root_genetic_algorithm/main/Image/sample.gif)  
